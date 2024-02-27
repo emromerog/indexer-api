@@ -19,3 +19,6 @@
 
 # Go workspace file
 go.work
+
+# Ignorar todo dentro de la carpeta "data"
+data/*

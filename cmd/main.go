@@ -1,17 +1,30 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
-	"github.com/emromerog/indexer-api/infrastructure/http"
+	"github.com/emromerog/indexer-api/pkg/fileManager"
+	"github.com/emromerog/indexer-api/pkg/http"
+	"github.com/emromerog/indexer-api/pkg/zincsearch"
 )
 
 func main() {
-	err := http.InitializeServer()
 
+	existIndex, err := zincsearch.CheckIndexExists()
+	checkError("Error verifying the index: ", err)
+
+	if !existIndex {
+		fileManager.ReadDir()
+	}
+
+	err = http.InitializeServer()
+	checkError("Error starting the server: ", err)
+}
+
+func checkError(msg string, err error) {
 	if err != nil {
-		fmt.Printf("Error al iniciar el servidor: %v\n", err)
+		log.Printf(msg, err)
 		os.Exit(1)
 	}
 }

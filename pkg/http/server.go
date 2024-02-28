@@ -42,7 +42,7 @@ func configureRouter() *chi.Mux {
 	// Mount the routes from the "routes" package under the "/api/v1" path as a subrouter
 	r.Mount("/api/v1/emails", routes.EmailRoutes())
 
-	r.Mount("/api/v1/profiler", middleware.Profiler())
+	r.Mount("/debug", middleware.Profiler())
 
 	// Define a basic route for the root path
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {

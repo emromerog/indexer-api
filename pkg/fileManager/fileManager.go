@@ -22,9 +22,6 @@ func ReadDirectories() {
 
 	pathMails := "../data/maildir"
 
-	// Canal para señalar finalización
-	//done := make(chan struct{})
-
 	err := filepath.Walk(pathMails,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -39,86 +36,49 @@ func ReadDirectories() {
 			return nil
 		})
 	if err != nil {
-		log.Printf("error processing directory: %v", err)
+		log.Printf("Error processing directory: %v", err)
 	}
 
 	wg.Wait()
 
-	/*go func() {
-		// Esperar a que todas las goroutines terminen
-		wg.Wait()
-
-		// Cerrar el canal al finalizar
-		close(done)
-	}()*/
-
 	lenEmails := len(emails)
 	log.Printf("The slice has %d elements...\n", lenEmails)
 
-	///////////////////////////////////
-	//const BulkDataBatchSize = 50000
-
-	// for i := 0; i < len(emails); i += BulkDataBatchSize {
-	// 	end := i + BulkDataBatchSize
-	// 	if end > len(emails) {
-	// 		end = len(emails)
-	// 	}
-
-	// 	// Crear un lote de datos
-	// 	batch := emails[i:end]
-
-	// 	wg.Add(1)
-	// 	go zincsearch.BulkData(batch, &wg)
-	// 	/*if err != nil {
-	// 		log.Printf("Error al enviar bulk data: %v\n", err)
-	// 		//return fmt.Errorf("error al realizar la solicitud: %v", err)
-	// 	}*/
-	// }
-
-	/////////////////////////////////////////
-
-	wg.Wait()
-
-	zincsearch.BulkData(emails /*, &wg*/)
-
-	log.Println("Todas las goroutines han terminado.")
+	sendData(emails)
 }
 
 /*Reads the files found in each directory*/
-func readFile(filePath string, wg *sync.WaitGroup, emails *[]models.Email, mu *sync.Mutex) /*(models.Email, error)*/ {
-	//para garantizar que la goroutine se marque como finalizada incluso si hay un error al abrir el archivo.
+func readFile(filePath string, wg *sync.WaitGroup, emails *[]models.Email, mu *sync.Mutex) {
+	//To ensure that the goroutine is marked as completed even if there is an error opening the file.
 	defer wg.Done()
 
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Printf("Error al abrir el archivo %s: %s\n", filePath, err)
+		log.Printf("Error opening the file %s: %s\n", filePath, err)
 		return
 	}
 	defer file.Close()
 
 	reader := bufio.NewReader(file)
-	//scanner := bufio.NewScanner(file)
 	var email models.Email
-	/*var flagContent bool*/
-	//var contentBuffer strings.Builder
+	var flagContent bool
 	var content string
 
 	for {
-		//for scanner.Scan() {
 		line, err := reader.ReadString('\n')
-		//line := scanner.Text()
 		if err != nil {
 			if err.Error() == "EOF" {
-				break // Se alcanzó el final del archivo
+				//The end of the file has been reached
+				break
 			} else {
-				log.Printf("Error al leer el archivo %s: %s\n", filePath, err)
+				log.Printf("Error reading file %s: %s\n", filePath, err)
 				break
 			}
 		}
 
 		switch {
-		/*case strings.HasPrefix(line, "Message-ID:"):
-		email.MessageId = strings.TrimSpace(strings.TrimPrefix(line, "Message-ID:"))*/
+		case strings.HasPrefix(line, "Message-ID:"):
+			email.MessageId = strings.TrimSpace(strings.TrimPrefix(line, "Message-ID:"))
 		case strings.HasPrefix(line, "Date:"):
 			email.Date = strings.TrimSpace(strings.TrimPrefix(line, "Date:"))
 		case strings.HasPrefix(line, "From:"):
@@ -133,37 +93,44 @@ func readFile(filePath string, wg *sync.WaitGroup, emails *[]models.Email, mu *s
 			email.ContentType = strings.TrimSpace(strings.TrimPrefix(line, "Content-Type:"))
 		case strings.HasPrefix(line, "Content-Transfer-Encoding:"):
 			email.ContentTransferEncoding = strings.TrimSpace(strings.TrimPrefix(line, "Content-Transfer-Encoding:"))
-			/*case strings.HasPrefix(line, "X-FileName:"):
-			//flagContent = true
+		case strings.HasPrefix(line, "X-FileName:"):
+			flagContent = true
 			email.XFileName = strings.TrimSpace(strings.TrimPrefix(line, "X-FileName:"))
-			case strings.HasPrefix(line, "Content:"):
-			email.Content = strings.TrimSpace(strings.TrimPrefix(line, "Content:"))*/
 		}
 
-		/*if flagContent {
+		if flagContent {
 			content = content + line
-		}*/
-
-		//content = content + line
+		}
 	}
-
-	/*if err := scanner.Err(); err != nil {
-		log.Printf("Error al leer el archivo %s: %s\n", filePath, err)
-	}}*/
 
 	email.Content = content
 
+	//Ensure that only one goroutine at a time has access to a critical section of code.
 	mu.Lock()
-
-	//email.Content = contentBuffer.String()
 
 	*emails = append(*emails, email)
 
-	/*defer*/
+	//When the goroutine has completed its work on the critical section, it calls mu.Unlock() to release the mutex lock.
 	mu.Unlock()
-
 }
 
-/*func sendBulkData() {
+/*Send records in batches*/
+func sendData(emails []models.Email) {
+	var wg sync.WaitGroup
 
-}*/
+	batchSize := 50000
+
+	for i := 0; i < len(emails); i += batchSize {
+		end := i + batchSize
+		if end > len(emails) {
+			end = len(emails)
+		}
+
+		batch := emails[i:end]
+
+		wg.Add(1)
+
+		go zincsearch.BulkData(batch, &wg)
+		wg.Wait()
+	}
+}

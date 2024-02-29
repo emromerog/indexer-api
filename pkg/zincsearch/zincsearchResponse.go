@@ -35,11 +35,3 @@ type EmailInfo struct {
 	Score  float64      `json:"_score"`
 	Source models.Email `json:"_source"`
 }
-
-/*type EmailData struct {
-	Timestamp time.Time `json:"@timestamp"`
-	Content   string    `json:"content"`
-	From      string    `json:"from"`
-	Subject   string    `json:"subject"`
-	To        string    `json:"to"`
-}*/

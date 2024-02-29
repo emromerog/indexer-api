@@ -12,10 +12,6 @@ import (
 	"github.com/emromerog/indexer-api/pkg/utils"
 )
 
-/*type Server struct {
-	Router *chi.Mux
-}*/
-
 func newRouter() *chi.Mux {
 	r := chi.NewRouter()
 	return r

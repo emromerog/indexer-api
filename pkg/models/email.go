@@ -1,7 +1,7 @@
 package models
 
 type Email struct {
-	//MessageId   string `json:"messageId"`
+	MessageId               string `json:"messageId"`
 	Date                    string `json:"date"`
 	From                    string `json:"from"`
 	To                      string `json:"to"`
@@ -14,7 +14,7 @@ type Email struct {
 	XCc                     string `json:"xCc"`
 	XBcc                    string `json:"xBcc"`
 	XFolder                 string `json:"xFolder"`
-	XOrigin                 string `json:"xOrigin"`
-	XFileName string `json:"xFileName"`*/
-	Content string `json:"content"`
+	XOrigin                 string `json:"xOrigin"`*/
+	XFileName string `json:"xFileName"`
+	Content   string `json:"content"`
 }

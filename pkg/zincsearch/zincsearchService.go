@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/emromerog/indexer-api/pkg/models"
 	"github.com/emromerog/indexer-api/pkg/utils"
@@ -22,18 +23,20 @@ const (
 	passwordAuth  = "Complexpass#123"
 )
 
+/*Add basic HTTP authentication headers to an HTTP request*/
 func setBasicAuth(req *http.Request) {
-	// Codificar las credenciales en base64
+	//Encode credentials in base64
 	auth := base64.StdEncoding.EncodeToString([]byte(userAuth + ":" + passwordAuth))
 	req.Header.Set("Content-Type", "application/json")
 	//req.Header.Add("Authorization", "Basic YWRtaW46Q29tcGxleHBhc3MjMTIz")
 	req.Header.Add("Authorization", "Basic "+auth)
 }
 
-func BulkData(records []models.Email /*, wg *sync.WaitGroup*/) error {
+/*Submit bulk data to zincsearch for indexing*/
+func BulkData(records []models.Email, wg *sync.WaitGroup) error {
 	log.Println("Sending data...")
 
-	//defer wg.Done()
+	defer wg.Done()
 
 	bulkApiURL := baseApiUrl + bulkv2Url
 
@@ -44,32 +47,34 @@ func BulkData(records []models.Email /*, wg *sync.WaitGroup*/) error {
 
 	jsonData, err := utils.ConvertToJson(body)
 	if err != nil {
-		return fmt.Errorf("error al convertir a JSON: %v", err)
+		return fmt.Errorf("error converting to JSON: %v", err)
+	} else {
+		log.Printf("Convert to json successful...")
 	}
 
 	// Crear una solicitud POST
 	req, err := http.NewRequest("POST", bulkApiURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return fmt.Errorf("error al crear la solicitud: %v", err)
+		return fmt.Errorf("error creating the request: %v", err)
+	} else {
+		log.Printf("Bulk data request successfully created...")
 	}
 
 	setBasicAuth(req)
 
-	// Cliente HTTP personalizado (puedes ajustar el timeout según tus necesidades)
 	client := &http.Client{}
 
-	// Realizar la solicitud POST
+	//Make the request
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("error al realizar la solicitud: %v", err)
+		return fmt.Errorf("error when making the request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	log.Println("Uploading data...")
 
-	// Leer la respuesta de la API
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("respuesta de la API no exitosa. Código de estado: %d", resp.StatusCode)
+		return fmt.Errorf("unsuccessful bulk upload: %d", resp.StatusCode)
 	}
 	if resp.StatusCode == http.StatusOK {
 		log.Println("Data uploaded...")
@@ -78,6 +83,7 @@ func BulkData(records []models.Email /*, wg *sync.WaitGroup*/) error {
 	return nil
 }
 
+/*Search for records indexed by match*/
 func SearchData(term string, searchType string) ([]models.Email, error) {
 	log.Println("Looking for information...")
 
@@ -142,6 +148,7 @@ func SearchData(term string, searchType string) ([]models.Email, error) {
 	return emails, nil
 }
 
+/*Check if the index to be created already exists*/
 func CheckIndexExists() (bool, error) {
 	indexApiURL := baseApiUrl + existIndexUrl + utils.IndexName
 
@@ -152,21 +159,20 @@ func CheckIndexExists() (bool, error) {
 
 	setBasicAuth(req)
 
-	// Realizar la solicitud GET
 	client := &http.Client{}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return false, fmt.Errorf("error al realizar la solicitud: %v", err)
 	}
+
 	defer resp.Body.Close()
 
-	// Leer la respuesta de la API
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return false, fmt.Errorf("error al leer la respuesta de la API: %v", err)
 	}
 
-	// Verificar el código de estado de la respuesta
 	if resp.StatusCode == http.StatusOK {
 		log.Println("Index with name " + utils.IndexName + " exists...")
 		return true, nil
@@ -174,9 +180,6 @@ func CheckIndexExists() (bool, error) {
 		log.Println("Index with name " + utils.IndexName + " does not exist...")
 		return false, nil
 	}
+
 	return false, fmt.Errorf("código de estado inesperado: %d", resp.StatusCode)
 }
-
-/*func createSearchDataRequest() {
-
-}*/

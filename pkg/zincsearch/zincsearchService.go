@@ -30,8 +30,10 @@ func setBasicAuth(req *http.Request) {
 	req.Header.Add("Authorization", "Basic "+auth)
 }
 
-func BulkData(records []models.Email) error {
+func BulkData(records []models.Email /*, wg *sync.WaitGroup*/) error {
 	log.Println("Sending data...")
+
+	//defer wg.Done()
 
 	bulkApiURL := baseApiUrl + bulkv2Url
 
@@ -63,16 +65,15 @@ func BulkData(records []models.Email) error {
 	}
 	defer resp.Body.Close()
 
+	log.Println("Uploading data...")
+
 	// Leer la respuesta de la API
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("respuesta de la API no exitosa. Código de estado: %d", resp.StatusCode)
 	}
-	/*responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("error al leer la respuesta de la API: %v", err)
-	}*/
-
-	log.Println("Data uploaded...")
+	if resp.StatusCode == http.StatusOK {
+		log.Println("Data uploaded...")
+	}
 
 	return nil
 }

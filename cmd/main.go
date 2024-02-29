@@ -15,7 +15,7 @@ func main() {
 	checkError("Error verifying the index: ", err)
 
 	if !existIndex {
-		fileManager.ReadDir()
+		fileManager.ReadDirectories()
 	}
 
 	err = http.InitializeServer()

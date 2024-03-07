@@ -20,7 +20,8 @@ func ReadDirectories() {
 	var emails []models.Email
 	var mu sync.Mutex
 
-	pathMails := "../data/maildir"
+	//pathMails := "../data/maildir"
+	pathMails := "D:/Erika/DECARGAS/enron_mail_20110402/maildir"
 
 	err := filepath.Walk(pathMails,
 		func(path string, info os.FileInfo, err error) error {

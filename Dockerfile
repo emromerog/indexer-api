@@ -26,10 +26,11 @@ COPY . /app
 #COPY . .
 
 # Build Golang API
-RUN go build -o cmd/main .
+RUN go build -o ./cmd/main ./cmd
 
 # Expose port 8080 the indexer API in golang
 EXPOSE 8080
 
 # Run
+#CMD ["./main"]
 CMD ["./cmd/main"]

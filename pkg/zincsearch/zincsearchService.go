@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/emromerog/indexer-api/pkg/models"
@@ -19,14 +20,14 @@ const (
 	bulkv2Url     = "_bulkv2"
 	searchUrl     = "/_search"
 	existIndexUrl = "index/"
-	userAuth      = "admin"
-	passwordAuth  = "Complexpass#123"
+	//userAuth      = os.Getenv("STRONGEST_AVENGER")
+	//passwordAuth  = "Complexpass#123"
 )
 
 /*Add basic HTTP authentication headers to an HTTP request*/
 func setBasicAuth(req *http.Request) {
 	//Encode credentials in base64
-	auth := base64.StdEncoding.EncodeToString([]byte(userAuth + ":" + passwordAuth))
+	auth := base64.StdEncoding.EncodeToString([]byte(os.Getenv("ZINC_FIRST_ADMIN_USER") + ":" + os.Getenv("ZINC_FIRST_ADMIN_PASSWORD")))
 	req.Header.Set("Content-Type", "application/json")
 	//req.Header.Add("Authorization", "Basic YWRtaW46Q29tcGxleHBhc3MjMTIz")
 	req.Header.Add("Authorization", "Basic "+auth)
@@ -41,7 +42,7 @@ func BulkData(records []models.Email, wg *sync.WaitGroup) error {
 	bulkApiURL := baseApiUrl + bulkv2Url
 
 	body := BulkDataRequest{
-		IndexName: utils.IndexName,
+		IndexName: os.Getenv("INDEX_NAME"),
 		Records:   records,
 	}
 

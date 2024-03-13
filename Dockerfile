@@ -8,16 +8,28 @@ ENV PROJECT_DIR=/app \
     GOOS=linux \
     GOARCH=amd64
 
-# Project setup - copiamos todo el proyecto a /app
+## Project setup
+
+# Create app directory inside container
 RUN mkdir app
+
+# cd /app
+WORKDIR /app
+
+COPY go.mod .
+
+# Download all dependencies
+RUN go mod download
+
+# Copies all files from local to container
 COPY . /app
-WORKDIR /app/cmd
+#COPY . .
 
-# Build - el ejecutable se llamara main
-RUN go build -o main .
+# Build Golang API
+RUN go build -o cmd/main .
 
-# Port api
+# Expose port 8080 the indexer API in golang
 EXPOSE 8080
 
-# Run - ejecutamos main
-CMD [ "/app/cmd/main" ]
+# Run
+CMD ["./cmd/main"]

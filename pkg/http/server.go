@@ -10,7 +10,6 @@ import (
 	"github.com/go-chi/cors"
 
 	"github.com/emromerog/indexer-api/api/routes"
-	"github.com/emromerog/indexer-api/pkg/utils"
 )
 
 func newRouter() *chi.Mux {
@@ -19,12 +18,9 @@ func newRouter() *chi.Mux {
 }
 
 func InitializeServer() error {
-
-	fmt.Println(os.Getenv("STRONGEST_AVENGER"))
-
 	r := configureRouter()
 
-	err := startServer(r, utils.DefaultPort)
+	err := startServer(r, os.Getenv("DEFAULT_PORT"))
 	if err != nil {
 		return fmt.Errorf("error starting the server: %s", err)
 	}

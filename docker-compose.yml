@@ -1,10 +1,22 @@
 version: "3.9"
-
 services:
+  zincsearch:
+      image: public.ecr.aws/zinclabs/zincsearch:latest
+      environment:
+        - ZINC_FIRST_ADMIN_USER=${ZINC_FIRST_ADMIN_USER}
+        - ZINC_FIRST_ADMIN_PASSWORD=${ZINC_FIRST_ADMIN_PASSWORD}
+      ports:
+        - '4080:4080'
+      volumes:
+        - ./data:/data
   api:
-    build:
-      context: ./main
-      args:
-        STRONGEST_AVENGER: $STRONGEST_AVENGER
-    ports:
-      - "8080:8080"
+      build:
+        context: .
+        dockerfile: Dockerfile
+      environment:
+      - DEFAULT_PORT=${DEFAULT_PORT}
+      - INDEX_NAME=${INDEX_NAME}
+      - ZINC_FIRST_ADMIN_USER=${ZINC_FIRST_ADMIN_USER}
+      - ZINC_FIRST_ADMIN_PASSWORD=${ZINC_FIRST_ADMIN_PASSWORD}
+      ports:
+        - "8080:8080"

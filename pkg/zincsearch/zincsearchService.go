@@ -103,7 +103,7 @@ func SearchData(term string, searchType string) ([]models.Email, error) {
 			EndTime:   "2025-12-02T15:28:31.894Z",
 		},
 		From:       0,
-		MaxResults: 1000,
+		MaxResults: 550000,
 		//Source:     []
 	}
 
@@ -147,6 +147,75 @@ func SearchData(term string, searchType string) ([]models.Email, error) {
 	}
 
 	return emails, nil
+}
+
+/*Search for records indexed by match*/
+func SearchDataJSON(term string, page int, itemsPerPage int, searchType string) (models.EmailSearchResponse, error) {
+	log.Println("Looking for information...")
+
+	searchApiURL := baseApiUrl + utils.IndexName + searchUrl
+
+	body := SearchDataRequest{
+		SearchType: searchType,
+		Query: SearchQuery{
+			Term: term,
+			//Field: "_all",
+			StartTime: "2000-06-02T14:28:31.894Z",
+			EndTime:   "2025-12-02T15:28:31.894Z",
+		},
+		From:       0,
+		MaxResults: 500000,
+		/*From:       page,
+		MaxResults: itemsPerPage,*/
+		//Source:     []
+	}
+
+	jsonData, err := utils.ConvertToJson(body)
+	if err != nil {
+		return models.EmailSearchResponse{}, err
+	}
+
+	req, err := http.NewRequest("POST", searchApiURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return models.EmailSearchResponse{}, fmt.Errorf("error al crear la solicitud: %v", err)
+	}
+
+	setBasicAuth(req)
+
+	client := &http.Client{}
+
+	// Realizar la solicitud POST
+	resp, err := client.Do(req)
+	if err != nil {
+		return models.EmailSearchResponse{}, fmt.Errorf("error al realizar la solicitud: %v", err)
+	}
+
+	defer resp.Body.Close()
+
+	// Leer la respuesta de la API
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return models.EmailSearchResponse{}, fmt.Errorf("error al leer la respuesta de la API: %v", err)
+	}
+
+	var searchDataResponse SearchDataResponse
+	if err := json.Unmarshal(responseBody, &searchDataResponse); err != nil {
+		return models.EmailSearchResponse{}, fmt.Errorf("error al analizar la respuesta JSON: %v", err)
+	}
+
+	emails := make([]models.Email, 0)
+
+	for _, hit := range searchDataResponse.Hits.Hits {
+		emails = append(emails, hit.Source)
+	}
+
+	var result models.EmailSearchResponse
+	result.TotalItems = len(emails)
+	result.ItemsPerPage = itemsPerPage
+	result.Page = page
+	result.Items = emails
+
+	return result, nil
 }
 
 /*Check if the index to be created already exists*/

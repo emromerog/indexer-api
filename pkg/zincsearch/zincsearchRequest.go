@@ -14,7 +14,7 @@ type SearchDataRequest struct {
 	Query      SearchQuery `json:"query"`
 	From       int         `json:"from"`
 	MaxResults int         `json:"max_results"`
-	Source     []string/*map[string]interface{}*/ `json:"_source"`
+	Source     []string    `json:"_source"`
 }
 
 type SearchQuery struct {

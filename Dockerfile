@@ -31,6 +31,8 @@ RUN go build -o ./cmd/main ./cmd
 # Expose port 8080 the indexer API in golang
 EXPOSE 8080
 
+WORKDIR /cmd
+
 # Run
-#CMD ["./main"]
-CMD ["./cmd/main"]
+CMD ["./main"]
+# CMD ["./cmd/main"]

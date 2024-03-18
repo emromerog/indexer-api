@@ -88,12 +88,12 @@ func readFile(filePath string, wg *sync.WaitGroup, emails *[]models.Email, mu *s
 			email.To = strings.TrimSpace(strings.TrimPrefix(line, "To:"))
 		case strings.HasPrefix(line, "Subject:"):
 			email.Subject = strings.TrimSpace(strings.TrimPrefix(line, "Subject:"))
-		case strings.HasPrefix(line, "Mime-Version:"):
+		/*case strings.HasPrefix(line, "Mime-Version:"):
 			email.MimeVersion = strings.TrimSpace(strings.TrimPrefix(line, "Mime-Version:"))
 		case strings.HasPrefix(line, "Content-Type:"):
 			email.ContentType = strings.TrimSpace(strings.TrimPrefix(line, "Content-Type:"))
 		case strings.HasPrefix(line, "Content-Transfer-Encoding:"):
-			email.ContentTransferEncoding = strings.TrimSpace(strings.TrimPrefix(line, "Content-Transfer-Encoding:"))
+			email.ContentTransferEncoding = strings.TrimSpace(strings.TrimPrefix(line, "Content-Transfer-Encoding:"))*/
 		case strings.HasPrefix(line, "X-FileName:"):
 			flagContent = true
 			email.XFileName = strings.TrimSpace(strings.TrimPrefix(line, "X-FileName:"))

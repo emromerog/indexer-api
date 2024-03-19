@@ -17,22 +17,35 @@ RUN mkdir app
 WORKDIR /app
 
 COPY go.mod .
+COPY go.sum .
 
 # Download all dependencies
 RUN go mod download
 
+# Declare custom args
+ARG DEFAULT_PORT \
+    INDEX_NAME \
+    ZINC_FIRST_ADMIN_USER \
+    ZINC_FIRST_ADMIN_PASSWORD
+
+ENV DEFAULT_PORT=${DEFAULT_PORT} \
+    INDEX_NAME=${INDEX_NAME} \
+    ZINC_FIRST_ADMIN_USER=${ZINC_FIRST_ADMIN_USER} \
+    ZINC_FIRST_ADMIN_PASSWORD=${ZINC_FIRST_ADMIN_PASSWORD}
+
 # Copies all files from local to container
-COPY . /app
-#COPY . .
+#COPY . /app
+COPY . .
 
 # Build Golang API
 RUN go build -o ./cmd/main ./cmd
 
 # Expose port 8080 the indexer API in golang
-EXPOSE 8080
+#EXPOSE 8080
 
-WORKDIR /cmd
+#WORKDIR /cmd
 
 # Run
-CMD ["./main"]
+#CMD ["./main"]
+CMD ["/app/cmd/main"]
 # CMD ["./cmd/main"]

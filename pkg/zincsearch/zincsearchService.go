@@ -15,8 +15,9 @@ import (
 	"github.com/emromerog/indexer-api/pkg/utils"
 )
 
-const (
-	baseApiUrl    = "http://localhost:4080/api/"
+var (
+	//baseApiUrl    = "http://localhost:4080/api/"
+	baseApiUrl    = os.Getenv("ZINCSEARCH_API_URL")
 	bulkv2Url     = "_bulkv2"
 	searchUrl     = "/_search"
 	existIndexUrl = "index/"

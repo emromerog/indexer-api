@@ -62,6 +62,7 @@ func SearchEmailsByTerm(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
+/*Gets all emails according to the search parameter by JSON*/
 func SearchEmailsByJSON(w http.ResponseWriter, r *http.Request) {
 	// Decodificar el JSON del cuerpo de la solicitud en la estructura SearchRequest
 	fmt.Println("controlador")

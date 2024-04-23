@@ -5,21 +5,23 @@ services:
     #volumes:
     #- ./data:/data
     environment:
-      - ZINC_DATA_PATH=/data
-      - ZINC_FIRST_ADMIN_USER=admin
-      - ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
+      # - ZINC_DATA_PATH=/data
+      - ZINC_FIRST_ADMIN_USER=${ZINC_FIRST_ADMIN_USER}
+      - ZINC_FIRST_ADMIN_PASSWORD=${ZINC_FIRST_ADMIN_PASSWORD}
     ports:
       - '4080:4080'
   apiserver:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - DEFAULT_PORT=8080
-      - INDEX_NAME=enron
-      - ZINC_FIRST_ADMIN_USER=admin
-      - ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
-      - ZINCSEARCH_API_URL=localhost:4080/api/
+    #environment:
+      # - DEFAULT_PORT=${DEFAULT_PORT}
+      # - INDEX_NAME=enron
+      # - ZINC_FIRST_ADMIN_USER=admin
+      # - ZINC_FIRST_ADMIN_PASSWORD=Complexpass#123
+      # - ZINCSEARCH_API_URL=localhost:4080/api/
+    args:
+      - DEFAULT_PORT=${DEFAULT_PORT}
     ports:
       - "8080:8080"
     depends_on:

@@ -4,9 +4,10 @@ type Email struct {
 	//Id        int    `json:"id"`
 	MessageId string `json:"messageId"`
 	Date      string `json:"date"`
-	From      string `json:"from"`
-	To        string `json:"to"`
-	Subject   string `json:"subject"`
+	//NewDate   time.Time `json:"newDate"`
+	From    string `json:"from"`
+	To      string `json:"to"`
+	Subject string `json:"subject"`
 	/*MimeVersion             string `json:"mimeVersion"`
 	ContentType             string `json:"contentType"`
 	ContentTransferEncoding string `json:"contentTransferEncoding"`

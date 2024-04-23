@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	//baseApiUrl    = "http://localhost:4080/api/"
-	baseApiUrl    = os.Getenv("ZINCSEARCH_API_URL")
+	baseApiUrl = "http://localhost:4080/api/"
+	//baseApiUrl    = os.Getenv("ZINCSEARCH_API_URL")
 	bulkv2Url     = "_bulkv2"
 	searchUrl     = "/_search"
 	existIndexUrl = "index/"
@@ -103,6 +103,7 @@ func SearchData(term string, searchType string) ([]models.Email, error) {
 			StartTime: "2000-06-02T14:28:31.894Z",
 			EndTime:   "2025-12-02T15:28:31.894Z",
 		},
+		SortFields: []string{"date"},
 		From:       0,
 		MaxResults: 550000,
 		//Source:     []

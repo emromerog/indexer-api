@@ -21,4 +21,4 @@
 go.work
 
 # Ignorar todo dentro de la carpeta "data"
-data/*
+data

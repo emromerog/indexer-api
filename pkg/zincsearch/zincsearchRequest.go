@@ -12,9 +12,10 @@ type BulkDataRequest struct {
 type SearchDataRequest struct {
 	SearchType string      `json:"search_type"`
 	Query      SearchQuery `json:"query"`
+	SortFields []string    `json:"sort_fields"`
 	From       int         `json:"from"`
 	MaxResults int         `json:"max_results"`
-	Source     []string/*map[string]interface{}*/ `json:"_source"`
+	Source     []string    `json:"_source"`
 }
 
 type SearchQuery struct {

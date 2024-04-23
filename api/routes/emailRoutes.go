@@ -14,7 +14,9 @@ func EmailRoutes() *chi.Mux {
 
 	r.Get("/", controllers.GetAllEmails)
 
-	r.Get("/search/{term}", controllers.SearchBookByTerm)
+	r.Get("/search/{term}", controllers.SearchEmailsByTerm)
+
+	r.Post("/", controllers.SearchEmailsByJSON)
 
 	return r
 }

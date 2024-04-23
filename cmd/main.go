@@ -2,14 +2,15 @@ package main
 
 import (
 	"log"
-	"os"
 
+	"github.com/emromerog/indexer-api/pkg/env"
 	"github.com/emromerog/indexer-api/pkg/fileManager"
 	"github.com/emromerog/indexer-api/pkg/http"
 	"github.com/emromerog/indexer-api/pkg/zincsearch"
 )
 
 func main() {
+	env.LoadVars()
 
 	existIndex, err := zincsearch.CheckIndexExists()
 	checkError("Error verifying the index: ", err)
@@ -24,7 +25,6 @@ func main() {
 
 func checkError(msg string, err error) {
 	if err != nil {
-		log.Printf(msg, err)
-		os.Exit(1)
+		log.Fatal(msg, err)
 	}
 }

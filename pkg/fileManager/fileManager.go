@@ -20,8 +20,8 @@ func ReadDirectories() {
 	var emails []models.Email
 	var mu sync.Mutex
 
-	//pathMails := "../data/maildir"
-	pathMails := "D:/Erika/DECARGAS/enron_mail_20110402/maildir"
+	pathMails := "../data/maildir"
+	//pathMails := "D:/Erika/DECARGAS/enron_mail_20110402/maildir"
 
 	err := filepath.Walk(pathMails,
 		func(path string, info os.FileInfo, err error) error {
@@ -82,18 +82,23 @@ func readFile(filePath string, wg *sync.WaitGroup, emails *[]models.Email, mu *s
 			email.MessageId = strings.TrimSpace(strings.TrimPrefix(line, "Message-ID:"))
 		case strings.HasPrefix(line, "Date:"):
 			email.Date = strings.TrimSpace(strings.TrimPrefix(line, "Date:"))
+			/*time.Parse(time.RFC3339, "2023-05-02T09:34:01Z")
+			const longForm = "Jan 2, 2006 at 3:04pm (MST)"
+			t1, _ := time.Parse(longForm, "Feb 3, 2013 at 7:54pm (PST)")
+			t2, _ := time.Parse(time.RFC3339, t1)
+			email.NewDate = t2*/
 		case strings.HasPrefix(line, "From:"):
 			email.From = strings.TrimSpace(strings.TrimPrefix(line, "From:"))
 		case strings.HasPrefix(line, "To:"):
 			email.To = strings.TrimSpace(strings.TrimPrefix(line, "To:"))
 		case strings.HasPrefix(line, "Subject:"):
 			email.Subject = strings.TrimSpace(strings.TrimPrefix(line, "Subject:"))
-		case strings.HasPrefix(line, "Mime-Version:"):
+		/*case strings.HasPrefix(line, "Mime-Version:"):
 			email.MimeVersion = strings.TrimSpace(strings.TrimPrefix(line, "Mime-Version:"))
 		case strings.HasPrefix(line, "Content-Type:"):
 			email.ContentType = strings.TrimSpace(strings.TrimPrefix(line, "Content-Type:"))
 		case strings.HasPrefix(line, "Content-Transfer-Encoding:"):
-			email.ContentTransferEncoding = strings.TrimSpace(strings.TrimPrefix(line, "Content-Transfer-Encoding:"))
+			email.ContentTransferEncoding = strings.TrimSpace(strings.TrimPrefix(line, "Content-Transfer-Encoding:"))*/
 		case strings.HasPrefix(line, "X-FileName:"):
 			flagContent = true
 			email.XFileName = strings.TrimSpace(strings.TrimPrefix(line, "X-FileName:"))
